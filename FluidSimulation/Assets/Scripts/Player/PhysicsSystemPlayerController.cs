@@ -5,14 +5,15 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class PhysicsSystemPlayerController : MonoBehaviour
 {
+    [Header("Raycasting")]
     const float skinWidth = 0.015f;
     public int horizontalRayCount = 4;
     public int verticalRayCount = 4;
     public LayerMask collisionMask;
-
     [SerializeField] float horizontalRaySpacing;
-    [SerializeField] float verticalRaySpacing;  
-    
+    [SerializeField] float verticalRaySpacing;
+
+    [Header("References")]
     public BoxCollider2D BC;
     public CollisionInfo collisionInfo;
 

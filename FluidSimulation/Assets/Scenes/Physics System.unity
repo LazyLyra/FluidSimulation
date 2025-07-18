@@ -156,8 +156,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocity: {x: 0, y: 0, z: 0}
-  MoveSpeed: 5
+  jumpHeight: 4
+  timeToJumpApex: 0.4
+  jumpVelocity: 5
   gravity: -10
+  MoveSpeed: 5
+  velocityXsmoothTime: 0.1
+  accelerationTimeAir: 0.2
+  accelerationTimeGround: 0.1
   controlScript: {fileID: 0}
 --- !u!114 &449399817
 MonoBehaviour:
