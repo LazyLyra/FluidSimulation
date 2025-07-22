@@ -6,17 +6,35 @@ using UnityEngine;
 public class WaterParticleScript : MonoBehaviour
 {
     [Header("Physics")]
-    [SerializeField] Vector2 velocity;
+    public Vector2 velocity;
     [SerializeField] float gravity;
+    //wall physics
     [SerializeField] float coefRestitutionX;
     [SerializeField] float coefRestitutionY;
+    //particle physics
+    [SerializeField] float clampVelocityX;
+    [SerializeField] float clampVelocityY;
+
+    public float coefResistutionParticles;
+    [SerializeField] float collisionDistance;
+    [Header("Pressure")]
+    [SerializeField] float pressuredistanceConstant;
+    [SerializeField] float pressureparticlesConstant;
+    [SerializeField] float pressureIncreaseRegion;
+
+    [Header("Viscosity")]
+    [SerializeField] float viscosityRegion;
+    [SerializeField] float viscosityFactorFixed;
+    [SerializeField] float viscosityFactorVariable;
 
     [Header("Raycasting")]
-    [SerializeField] float skinWidth;
+    //for wall collisions
+    [SerializeField] float skinWidth; 
     public LayerMask wallLayer;
 
     [Header("References")]
     public CircleCollider2D CC;
+    public ParticleManager PM;
     RaycastOrigins raycastOrigins;
     CollisionInfo collisionInfo;
 
@@ -24,6 +42,7 @@ public class WaterParticleScript : MonoBehaviour
     void Start()
     {
         CC = GetComponent<CircleCollider2D>();
+        PM = GameObject.FindGameObjectWithTag("Manager").GetComponent<ParticleManager>();
     }
 
     // Update is called once per frame
@@ -52,6 +71,9 @@ public class WaterParticleScript : MonoBehaviour
         {
             VerticalCollision();
         }
+
+        vel.x = Mathf.Clamp(vel.x, -clampVelocityX, clampVelocityX);
+        vel.y = Mathf.Clamp(vel.y, -clampVelocityY, clampVelocityY);
 
         transform.Translate(vel);
     }
@@ -122,6 +144,52 @@ public class WaterParticleScript : MonoBehaviour
             //print("VERTICAL COLLISION");
         }
     }
+
+    //collision with other particles
+
+    public void HandleCollision(WaterParticleScript collidingParticle)
+    {
+        float distance = Vector2.Distance(collidingParticle.transform.position, transform.position);
+
+
+        if (distance < collisionDistance && distance > 0)
+        {
+            print("we collided !");
+
+            int nearbyParticles = 0;
+
+            for (int i = 0; i < PM.spawnNumber; i++)
+            {
+                if (Vector2.Distance(PM.particleArray[i].transform.position, transform.position) < pressureIncreaseRegion)
+                {
+                    nearbyParticles += 1;
+                }
+                else if (Vector2.Distance(PM.particleArray[i].transform.position, transform.position) < viscosityRegion)
+                {
+                    if (Vector3.Magnitude(velocity) > Vector3.Magnitude(PM.particleArray[i].velocity))
+                    {
+                        viscosityFactorVariable = 1 / viscosityFactorFixed;
+                        PM.particleArray[i].viscosityFactorVariable = viscosityFactorFixed;
+                    }
+                    else
+                    {
+                        viscosityFactorVariable = viscosityFactorFixed;
+                        PM.particleArray[i].viscosityFactorVariable = 1 / viscosityFactorFixed;
+                    }
+                }
+            }
+
+                Vector2 AB = collidingParticle.transform.position - transform.position;
+            // direction * affect from nearby particles * affect from collision distance
+            //velocity = velocity + (-1 * AB.normalized * coefResistutionParticles) * (pressureparticlesConstant * nearbyParticles) * (pressuredistanceConstant * (1 / distance)) * viscosityFactorVariable;
+            velocity = velocity + (-1 * AB.normalized * coefResistutionParticles);
+
+            // same but for the other particle lol
+            //collidingParticle.velocity = collidingParticle.velocity + (AB.normalized * coefResistutionParticles) * (pressureparticlesConstant * nearbyParticles) * (pressuredistanceConstant * (1 / distance)) * viscosityFactorVariable;
+            collidingParticle.velocity = collidingParticle.velocity + (AB.normalized * coefResistutionParticles);
+        }
+    }
+
 
 
     struct RaycastOrigins
