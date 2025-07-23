@@ -135,10 +135,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   velocity: {x: 0, y: 0}
   gravity: -10
-  coefRestitutionX: 0.8
-  coefRestitutionY: 0.8
-  clampVelocityX: 10
-  clampVelocityY: 10
+  timer: 0
+  slopeCollisionCD: 0.1
+  coefRestitutionX: 0.5
+  coefRestitutionY: 0.25
+  clampVelocityX: 4
+  clampVelocityY: 4
+  maxClimbAngle: 80
+  maxDescendAngle: 80
+  currentGroundAngle: 0
   coefResistutionParticles: 0.5
   collisionDistance: 0.4
   pressuredistanceConstant: 0.1

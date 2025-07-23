@@ -61,7 +61,7 @@ public class ParticleManager : MonoBehaviour
     void SpawnParticle()
     {
         
-        GameObject currentParticle = Instantiate(particle);
+        GameObject currentParticle = Instantiate(particle, transform.position, Quaternion.Euler(0,0,0));
         WaterParticleScript WPS = currentParticle.GetComponent<WaterParticleScript>();
         WPS.velocity = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
 
